@@ -22,13 +22,14 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
 ]
 packages = [
-    { include = "src/pytest_pipesnap" },
+    { include = "pytest_pipesnap", from = "src" },
 ]
 
 [tool.poetry.dependencies]
 python = "^3.8"
 pytest = "^8.1.1"
 pyyaml = "^6.0.1"
+ruff = "^0.3.4"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.9.0"
@@ -38,4 +39,4 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.plugins."pytest11"]
-"pipesnap" = "src.pytest_pipesnap.plugin"
+"pipesnap" = "pytest_pipesnap.plugin"
