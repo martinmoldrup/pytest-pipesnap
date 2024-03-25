@@ -1,0 +1,9 @@
+
+# $schema: "http://json-schema.org/draft-07/schema#"
+scenarios:
+  - name: Scenario 1
+    some_key: some_value 1
+    content: dummy scenario
+  - name: Scenario 2
+    some_key: some_value 2
+    content: dummy scenario

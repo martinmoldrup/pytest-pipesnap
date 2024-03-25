@@ -1,6 +1,6 @@
 import pytest
 
-
+# TODO - Remove demo code
 def pytest_addoption(parser):
     group = parser.getgroup('pipesnap')
     group.addoption(
@@ -13,7 +13,8 @@ def pytest_addoption(parser):
 
     parser.addini('HELLO', 'Dummy pytest.ini setting')
 
-
+# TODO - Remove demo code
 @pytest.fixture
 def bar(request):
     return request.config.option.dest_foo
+
