@@ -10,7 +10,7 @@ import json
 import logging
 
 logger = logging.getLogger(__name__)
-scenarios_file_names = ['scenarios.yaml', 'scenarios.yml', 'scenarios.json']
+SCENARIOS_FILE_NAMES = ['scenarios.yaml', 'scenarios.yml', 'scenarios.json']
 
 class ExceptionDuringTestSetup(Exception):
     pass
@@ -21,7 +21,7 @@ def get_scenarios(test_case: pathlib.Path, scenarios_file_name: Optional[str], t
         if not location.is_file():
             raise FileNotFoundError(f"Could not find scenarios file {scenarios_file_name} in {test_case_location}")
     else:
-        for scenarios_file_name in scenarios_file_names:
+        for scenarios_file_name in SCENARIOS_FILE_NAMES:
             location = test_case / scenarios_file_name
             if location.is_file():
                 break
