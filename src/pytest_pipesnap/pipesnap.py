@@ -120,16 +120,22 @@ class TestCase:
         """Read a file in the test case directory."""
         return (self.path / filename).read_text()
 
-
 @dataclass
-class PipelineOutput:
+class ProduceTestData:
     """Pipeline Output"""
     path: pathlib.Path
+    param_name: str
 
-    def save_output(self, pipeline_output_content: str): ...
+    def save_output(self, pipeline_output_content: str):
+        self._save_output(pipeline_output_content, self.param_name)
+
+    def _save_output(self, pipeline_output_content: str, param_name: str):
+        file_path = self.path / f"{param_name}.txt"
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        file_path.write_text(pipeline_output_content)
 
 @dataclass
-class PipelineInput:
+class ConsumeTestData:
     """Pipeline Input"""
     path: pathlib.Path
     content: str

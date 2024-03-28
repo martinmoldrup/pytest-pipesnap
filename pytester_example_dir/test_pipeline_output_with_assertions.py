@@ -1,8 +1,8 @@
-from pytest_pipesnap.pipesnap import PipelineOutput
+from pytest_pipesnap.pipesnap import ProduceTestData
 import pytest
 
-@pytest.mark.pipeline_output(3)
-def test_step_1(pipeline_output: PipelineOutput):
+@pytest.mark.produce_test_data
+def test_step_1(pipeline_output: ProduceTestData):
     pipeline_output.save_output("Hello World")
     pipeline_output.assert_immutable()
     pipeline_output.assert_type(List[int])

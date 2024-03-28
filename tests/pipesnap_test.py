@@ -51,7 +51,7 @@ def test_simple_testcases_with_scenarios_json(pytester: Pytester) -> None:
 
 
 
-@pytest.mark.skip("Not implemented")
+# @pytest.mark.skip("Not implemented")
 def test_pipeline_output(pytester: Pytester) -> None:
     pytester.copy_example("test_pipeline_output.py")
     result = pytester.runpytest()

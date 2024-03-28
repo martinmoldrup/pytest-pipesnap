@@ -1,6 +1,6 @@
-from pytest_pipesnap.pipesnap import PipelineOutput
+from pytest_pipesnap.pipesnap import ProduceTestData
 import pytest
 
-@pytest.mark.pipeline_output(3)
-def test_step_1(save_output_func: PipelineOutput):
+@pytest.mark.produce_test_data
+def test_step_1(save_output_func: ProduceTestData):
     save_output_func.save_output("Hello World")
