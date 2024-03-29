@@ -1,8 +1,7 @@
-import pytest
-import pathlib
-from pytest import Pytester
-import yaml
 import json
+
+import yaml
+from pytest import Pytester
 
 
 def test_simple_testcases(pytester: Pytester) -> None:
@@ -27,7 +26,7 @@ def test_simple_testcases_with_scenarios_yaml(pytester: Pytester) -> None:
 
 
     pytester.copy_example("test_simple_testcases_with_scenarios.py")
-    result = pytester.runpytest('-vv')
+    result = pytester.runpytest("-vv")
     result.assert_outcomes(passed=4)
 
 def test_simple_testcases_with_scenarios_json(pytester: Pytester) -> None:

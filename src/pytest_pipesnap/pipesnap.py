@@ -1,15 +1,15 @@
+import logging
 import os
-import pytest
 import pathlib
-from typing import Callable, List, Union, Optional
 from dataclasses import dataclass
 from functools import wraps
+from typing import Callable, List, Optional, Union
 
+import pytest
 import yaml
-import logging
 
 logger = logging.getLogger(__name__)
-SCENARIOS_FILE_NAMES = ['scenarios.yaml', 'scenarios.yml', 'scenarios.json']
+SCENARIOS_FILE_NAMES = ["scenarios.yaml", "scenarios.yml", "scenarios.json"]
 
 class ExceptionDuringTestSetup(Exception):
     pass
@@ -27,8 +27,8 @@ def get_scenarios(test_case: pathlib.Path, scenarios_file_name: Optional[str], t
         else:
             return None
 
-    with open(location, 'r') as f:
-        return yaml.safe_load(f)['scenarios']
+    with open(location) as f:
+        return yaml.safe_load(f)["scenarios"]
 
 
 
@@ -56,7 +56,7 @@ def foreach_test_case_in_directory(
                 scenarios = get_scenarios(test_case, scenarios_file_name, test_case_location)
             except FileNotFoundError as e:
                 # Case where no scenarios file was found, but it was expected
-                raise ExceptionDuringTestSetup(f"Could not find scenarios file for test case {test_case}: {str(e)}") from e
+                raise ExceptionDuringTestSetup(f"Could not find scenarios file for test case {test_case}: {e!s}") from e
             else:
                 if scenarios is None:
                     # Case where no scenarios file was found
@@ -64,15 +64,15 @@ def foreach_test_case_in_directory(
                         CaseData(
                             path=test_case,
                             scenario=None,
-                        )
+                        ),
                     )
                     continue
                 for scenario in scenarios:
                     out.append(
                         CaseData(
                             path=test_case,
-                            scenario=scenario
-                        )
+                            scenario=scenario,
+                        ),
                     )
         return out
 
@@ -90,11 +90,11 @@ def foreach_test_case_in_directory(
         try:
             test_cases = get_test_cases_and_scenarios()
         except Exception as e:
-            test_cases = [CaseData(path=pathlib.Path(''), scenario={}, _exception=e)]
+            test_cases = [CaseData(path=pathlib.Path(), scenario={}, _exception=e)]
         if not test_cases:
             raise ExceptionDuringTestSetup("No test cases found")
 
-        @pytest.mark.get_test_cases_and_scenarios
+        @pytest.mark.get_test_cases_and_scenarios()
         # @pytest.mark.contains_snapshot(test_case_location=test_case_location)
         @pytest.mark.parametrize("test_case", test_cases, ids=create_id)
         @wraps(func)
@@ -113,9 +113,9 @@ class CaseData:
         """If an exception was raised during the setup of the tests, raise an exception when trying to access the attribute."""
         exception = object.__getattribute__(self, "_exception")
         if exception is not None and os.getenv("PYTEST_CURRENT_TEST"):
-            raise ExceptionDuringTestSetup(f'When during setup of the tests an error was raised: {exception}') from exception
+            raise ExceptionDuringTestSetup(f"When during setup of the tests an error was raised: {exception}") from exception
         return object.__getattribute__(self, name)
-    
+
 
     def read_file(self, filename: str) -> str:
         """Read a file in the test case directory."""
@@ -124,6 +124,7 @@ class CaseData:
 @dataclass
 class ProduceTestData:
     """Pipeline Output"""
+
     path: pathlib.Path
     param_name: str
 
@@ -138,7 +139,9 @@ class ProduceTestData:
 @dataclass
 class ConsumeTestData:
     """Pipeline Input"""
+
     path: pathlib.Path
     content: str
 
-    def read_input(self) -> str: ...
+    def read_input(self) -> str:
+        raise NotImplementedError()

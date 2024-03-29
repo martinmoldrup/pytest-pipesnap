@@ -1,7 +1,8 @@
 import pytest
-from pytest_pipesnap.pipesnap import ProduceTestData, ConsumeTestData
+from pytest_pipesnap.pipesnap import ConsumeTestData, ProduceTestData
 
-@pytest.mark.foreach(['a', 'b', 'c'])
+
+@pytest.mark.foreach(["a", "b", "c"])
 def test_step_1(produce_test_data: ProduceTestData):
     produce_test_data.save_output("Hello World")
 

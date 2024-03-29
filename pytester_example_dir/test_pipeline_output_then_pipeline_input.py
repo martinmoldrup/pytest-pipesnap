@@ -1,5 +1,6 @@
-from pytest_pipesnap.pipesnap import ProduceTestData, ConsumeTestData
 import pytest
+from pytest_pipesnap.pipesnap import ConsumeTestData, ProduceTestData
+
 
 @pytest.mark.produce_test_data("step_1_output")  # produce_test_data, share_test_output
 def test_step_1(save_output_func: ProduceTestData):
