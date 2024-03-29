@@ -1,6 +1,4 @@
-from dataclasses import dataclass
-from .pipesnap import ProduceTestData
-from functools import partial
+from .pipesnap import ProduceTestData, ConsumeTestData, CaseData
 import pathlib
 import pytest
 
@@ -13,28 +11,57 @@ def pytest_addoption(parser):
         default=False,
         help="Update the pipeline snapshot files with the new output",
     )
+@pytest.fixture
+def produce_test_data(request: pytest.FixtureRequest) -> ProduceTestData:
+    """"""
+    test_function_name = request.node.originalname
+    # If a parameter is provided
+    if hasattr(request, "param"):
+        return ProduceTestData(
+            path=pathlib.Path(f"pipeline_output/{test_function_name}/{request.param}"),
+            param_name=request.param,
+        )
+    return ProduceTestData(
+        path=pathlib.Path(f"pipeline_output/{test_function_name}"),
+        param_name=test_function_name,
+    )
 
+@pytest.fixture
+def consume_test_data(request: pytest.FixtureRequest) -> ConsumeTestData:
+    """"""
+    param: str = request.param
+    return ConsumeTestData(
+        path=pathlib.Path(f"pipeline_output/{param}"),
+        content="",
+    )
+
+@pytest.fixture
+def test_data(request: pytest.FixtureRequest) -> CaseData:
+    test_function_name = request.node.originalname
+    if hasattr(request, "param"):
+        return CaseData(
+            path=pathlib.Path(f"pipeline_output/{test_function_name}/{request.param}"),
+            scenario=request.param,
+        )
+    return CaseData(
+        path=pathlib.Path(f"pipeline_output/{test_function_name}"),
+        scenario={},
+    )
 
 def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
     # TODO Handle when no parametrization is used
     # TODO Handle when parametrizations are used
     # Check for pipeline_input marker
-    pipeline_output_marker = metafunc.definition.get_closest_marker("produce_test_data")
-    if pipeline_output_marker and len(metafunc.fixturenames) == 1:
-        name_of_test_function = metafunc.function.__name__
-        parameters = [name_of_test_function]  # TODO: Get the parameters from the marker
-        final_parameters = []
-        for param in parameters:
-            pipeline_output = ProduceTestData(
-                path=pathlib.Path(f"pipeline_output/{name_of_test_function}"),
-                param_name=str(param),
-            )
-            final_parameters.append(pipeline_output)
-        metafunc.parametrize(metafunc.fixturenames[0], final_parameters)
+    pipeline_output_marker = metafunc.definition.get_closest_marker("foreach")
+    if pipeline_output_marker:
+        parameters = pipeline_output_marker.args[0]
+        metafunc.parametrize("produce_test_data", parameters, indirect=True)
 
     pipeline_input_marker = metafunc.definition.get_closest_marker("consume_test_data")
     if pipeline_input_marker:
         input_name = pipeline_input_marker.args[0]
         path = pathlib.Path(f"pipeline_output/{input_name}")
-        file_paths = list(path.glob("*.txt"))
-        metafunc.parametrize(metafunc.fixturenames[0], file_paths)
+        subdirectories = [p.stem for p in path.glob("*") if p.is_dir()]
+        if subdirectories:
+            metafunc.parametrize("consume_test_data", subdirectories, indirect=True)
+

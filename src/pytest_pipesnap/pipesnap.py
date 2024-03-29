@@ -1,12 +1,11 @@
 import os
 import pytest
 import pathlib
-from typing import Callable, List, Tuple, Union, Optional, Dict, Any
+from typing import Callable, List, Union, Optional
 from dataclasses import dataclass
 from functools import wraps
 
 import yaml
-import json
 import logging
 
 logger = logging.getLogger(__name__)
@@ -32,6 +31,8 @@ def get_scenarios(test_case: pathlib.Path, scenarios_file_name: Optional[str], t
         return yaml.safe_load(f)['scenarios']
 
 
+
+
 def foreach_test_case_in_directory(
     path: Union[pathlib.Path, str],
     scenarios_file_name: Optional[str] = None,
@@ -44,7 +45,7 @@ def foreach_test_case_in_directory(
 
 
 
-    def get_test_cases_and_scenarios() -> List[TestCase]:
+    def get_test_cases_and_scenarios() -> List[CaseData]:
 
         test_cases = pathlib.Path(test_case_location)
         out = []
@@ -60,7 +61,7 @@ def foreach_test_case_in_directory(
                 if scenarios is None:
                     # Case where no scenarios file was found
                     out.append(
-                        TestCase(
+                        CaseData(
                             path=test_case,
                             scenario=None,
                         )
@@ -68,14 +69,14 @@ def foreach_test_case_in_directory(
                     continue
                 for scenario in scenarios:
                     out.append(
-                        TestCase(
+                        CaseData(
                             path=test_case,
                             scenario=scenario
                         )
                     )
         return out
 
-    def create_id(x: TestCase):
+    def create_id(x: CaseData):
         try:
             if x.scenario:
                 return f"{x.path.stem}_{x.scenario['name']}"
@@ -89,7 +90,7 @@ def foreach_test_case_in_directory(
         try:
             test_cases = get_test_cases_and_scenarios()
         except Exception as e:
-            test_cases = [TestCase(path=pathlib.Path(''), scenario={}, _exception=e)]
+            test_cases = [CaseData(path=pathlib.Path(''), scenario={}, _exception=e)]
         if not test_cases:
             raise ExceptionDuringTestSetup("No test cases found")
 
@@ -103,7 +104,7 @@ def foreach_test_case_in_directory(
     return decorator
 
 @dataclass
-class TestCase:
+class CaseData:
     path: pathlib.Path
     scenario: Optional[dict]
     _exception: Optional[Exception] = None

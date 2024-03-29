@@ -18,6 +18,26 @@ To solve the problems that data scientists have when testing their code in pytho
 - Assertions on built-in types
 - Expections on pandas dataframes and numpy data structures
 
+# The testing heirarchy
+The testing heirarchy is as follows:
+- *CaseExample*: A single test case that is run by pytest. A case can have multiple scenarios.
+- *Scenario*: A scenario is a single configuration of the test case. A scenario can have multiple test data sets.
+- *Assertion*: An assertion is a single check that is run on the test data. An assertion can have multiple checks.
+
+- **Test Function**: Uses: Case Examples [the pytest function that runs the test cases]
+  - **CaseData**: Uses: Case Data, Scenarios [a single test case with a single scenario to be ran]
+    - **path** [files used as inputs]
+    - **Scenario**: Uses: Input Configuration, Assertions, Expections [there might be multiple scenarios, for one case data]
+        - **Input configuration** [input arguments and configurations for the test]
+        - **Assertion** [assertions on the output]
+        - **Expection** [fuzzy expections on the output]
+
+
+# Fixtures provided
+- `case_data` - A fixture that provides the test case data, use @pytest.mark.test_case to parametrize with more test cases.
+- `produce_test_data` - A fixture that produces test data to be used in other tests. Use @pytest.mark.produce_test_data() to configure.
+- `consume_test_data` - A fixture that consumes test data from other tests. Use @pytest.mark.consume_test_data() to configure.
+
 
 # Contribute
 This project is in an early stage and I would love to get feedback on the concept and the implementation. Please open an issue if you have any feedback or ideas for improvements.
