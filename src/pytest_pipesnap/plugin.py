@@ -51,9 +51,6 @@ def test_data(request: pytest.FixtureRequest) -> CaseData:
     )
 
 def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
-    # TODO Handle when no parametrization is used
-    # TODO Handle when parametrizations are used
-    # Check for pipeline_input marker
     pipeline_output_marker = metafunc.definition.get_closest_marker("foreach")
     if pipeline_output_marker:
         parameters = pipeline_output_marker.args[0]

@@ -1,3 +1,4 @@
+"""Functions and decorators to be imported and used by the user to configure tests."""
 import logging
 import os
 import pathlib
@@ -11,8 +12,9 @@ import yaml
 logger = logging.getLogger(__name__)
 SCENARIOS_FILE_NAMES = ["scenarios.yaml", "scenarios.yml", "scenarios.json"]
 
-class ExceptionDuringTestSetup(Exception):
-    pass
+class ExceptionDuringTestSetupError(Exception):
+    """Error raised when an exception is raised during the setup of the tests."""
+
 
 def get_scenarios(test_case: pathlib.Path, scenarios_file_name: Optional[str], test_case_location: pathlib.Path) -> Optional[List[dict]]:
     if scenarios_file_name is not None:
@@ -56,7 +58,7 @@ def foreach_test_case_in_directory(
                 scenarios = get_scenarios(test_case, scenarios_file_name, test_case_location)
             except FileNotFoundError as e:
                 # Case where no scenarios file was found, but it was expected
-                raise ExceptionDuringTestSetup(f"Could not find scenarios file for test case {test_case}: {e!s}") from e
+                raise ExceptionDuringTestSetupError(f"Could not find scenarios file for test case {test_case}: {e!s}") from e
             else:
                 if scenarios is None:
                     # Case where no scenarios file was found
@@ -76,7 +78,7 @@ def foreach_test_case_in_directory(
                     )
         return out
 
-    def create_id(x: CaseData):
+    def create_id(x: CaseData) -> Optional[str]:
         try:
             if x.scenario:
                 return f"{x.path.stem}_{x.scenario['name']}"
@@ -92,7 +94,7 @@ def foreach_test_case_in_directory(
         except Exception as e:
             test_cases = [CaseData(path=pathlib.Path(), scenario={}, _exception=e)]
         if not test_cases:
-            raise ExceptionDuringTestSetup("No test cases found")
+            raise ExceptionDuringTestSetupError("No test cases found")
 
         @pytest.mark.get_test_cases_and_scenarios()
         # @pytest.mark.contains_snapshot(test_case_location=test_case_location)
@@ -109,11 +111,11 @@ class CaseData:
     scenario: Optional[dict]
     _exception: Optional[Exception] = None
 
-    def __getattribute__(self, name):
+    def __getattribute__(self, name: str):
         """If an exception was raised during the setup of the tests, raise an exception when trying to access the attribute."""
         exception = object.__getattribute__(self, "_exception")
         if exception is not None and os.getenv("PYTEST_CURRENT_TEST"):
-            raise ExceptionDuringTestSetup(f"When during setup of the tests an error was raised: {exception}") from exception
+            raise ExceptionDuringTestSetupError(f"When during setup of the tests an error was raised: {exception}") from exception
         return object.__getattribute__(self, name)
 
 
@@ -138,7 +140,7 @@ class ProduceTestData:
 
 @dataclass
 class ConsumeTestData:
-    """Pipeline Input"""
+    """Pipeline Input."""
 
     path: pathlib.Path
     content: str
